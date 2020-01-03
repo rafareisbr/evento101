@@ -1,4 +1,4 @@
-from django.db import models, DatabaseError
+from django.db import models
 from django.contrib.auth.models import User
 
 
@@ -26,7 +26,6 @@ class Evento(models.Model):
     descricao = models.TextField()
     local = models.CharField(max_length=255)
     data_hora = models.DateTimeField()
-
     organizador = models.ForeignKey(
         Usuario,
         on_delete=models.CASCADE,
@@ -35,14 +34,21 @@ class Evento(models.Model):
     def __str__(self):
         return self.nome
 
-    def adicionar_tipo(self, usuario, tipo):
-        """Inscrever um usuário no Evento e retornar a Inscricao"""
-        nova_inscricao = Inscricao.objects.create(tipo, inscrito=usuario, evento=self)
-        return nova_inscricao
+    def adicionar_tipo(self, nome, descricao, preco, quantidade, data_inicio_vendas, data_fim_vendas):
+        """Adiciona um tipo de Inscrição ao evento. Exemplo: Gratuita."""
+        novo_tipo_inscricao = TipoInscricao.objects.create(
+            evento=self, nome=nome,
+            descricao=descricao, preco=preco,
+            quantidade=quantidade,
+            data_inicio_vendas=data_inicio_vendas,
+            data_fim_vendas=data_fim_vendas
+        )
+        return novo_tipo_inscricao
 
-    def inscrever(self, usuario, tipo):
+    def inscrever(self, tipo_evento, usuario_inscrito):
         """Inscrever um usuário no Evento e retornar a Inscricao"""
-        nova_inscricao = Inscricao.objects.create(tipo, inscrito=usuario, evento=self)
+        nova_inscricao = Inscricao.objects.create(
+            evento=self, tipo=tipo_evento, inscrito=usuario_inscrito)
         return nova_inscricao
 
     class Meta:
@@ -66,7 +72,7 @@ class TipoInscricao(models.Model):
         related_name='evento')
 
     def __str__(self):
-        return self.nome
+        return f'{self.nome} - {self.preco}'
 
     class Meta:
         verbose_name_plural = 'Tipos de Inscrições'
