@@ -33,8 +33,14 @@ class Evento(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    def add_inscricao(self, tipo_evento, usuario_inscrito):
+        """Inscrever um usuário no Evento e retornar a Inscricao"""
+        nova_inscricao = Inscricao.objects.create(
+            evento=self, tipo=tipo_evento, inscrito=usuario_inscrito)
+        return nova_inscricao
 
-    def adicionar_tipo(self, nome, descricao, preco, quantidade, data_inicio_vendas, data_fim_vendas):
+    def add_tipo_inscricao(self, nome, descricao, preco, quantidade, data_inicio_vendas, data_fim_vendas):
         """Adiciona um tipo de Inscrição ao evento. Exemplo: Gratuita."""
         novo_tipo_inscricao = TipoInscricao.objects.create(
             evento=self, nome=nome,
@@ -44,13 +50,7 @@ class Evento(models.Model):
             data_fim_vendas=data_fim_vendas
         )
         return novo_tipo_inscricao
-
-    def inscrever(self, tipo_evento, usuario_inscrito):
-        """Inscrever um usuário no Evento e retornar a Inscricao"""
-        nova_inscricao = Inscricao.objects.create(
-            evento=self, tipo=tipo_evento, inscrito=usuario_inscrito)
-        return nova_inscricao
-
+    
     class Meta:
         verbose_name_plural = 'Eventos'
 
